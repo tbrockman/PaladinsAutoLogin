@@ -1,15 +1,25 @@
-import subprocess, pyautogui, os, sys, json, msvcrt
+import subprocess, pyautogui, os, sys, json, msvcrt, time
 import win32con, ctypes, ctypes.wintypes
 from tkinter.filedialog import askopenfilename
 
 config_file = "CONFIG"
 
+def load_config_file():
+    with open(config_file) as json_config:
+        try:
+            py_dict = json.load(json_config)
+            return py_dict
+
+        except:
+            print("Error loading config file, verify CONFIG is properly formatted JSON.")
+            sys.exit(1)
+
+
 def start_paladins(steam_path):
-    subprocess.call([steam_path, "-applaunch", "444090"])
-    return
+    return subprocess.call([steam_path, "-applaunch", "444090"])
 
 def close_paladins():
-    return
+    return os.system('taskkill /f /im Paladins.exe')
 
 # vkcodes
 # https://gist.github.com/chriskiehl/2906125
@@ -43,20 +53,23 @@ def record_mouse_positions():
 
     return coordinates
 
+def click_coordinates(coordinates):
+    for i in range(len(coordinates)):
+        time.sleep(60)
+        pyautogui.click(coordinates[i])
 
-def execute_click_series(coordinates):
     return
 
 if __name__ == "__main__":
 
     if not os.path.isfile(config_file):
         with open(config_file, "w+") as json_config:
-            steam_path = askopenfilename(title="Navigate to your steam folder and select the 'Steam.exe' file.")
+            steam_path = askopenfilename(title="Navigate to your Steam folder and select 'Steam.exe'")
             if (len(steam_path) == 0):
                 print("No file selected, exitting.")
                 json_config.close()
                 os.remove(config_file)
-                sys.exit(0)
+                sys.exit(1)
 
             start_paladins(steam_path)
 
@@ -70,10 +83,20 @@ if __name__ == "__main__":
             json.dump(data, json_config)
             json_config.close()
 
-    with open(config_file) as json_config:
-        py_dict = json.load(json_config)
-        path = py_dict['path']
+    else:
+        py_dict = load_config_file()
+        steam_path = py_dict['path']
+
+        if not steam_path:
+            print("No path to Steam.exe, verify CONFIG file.")
+            sys.exit(1)
+
         coordinates = py_dict['coordinates']
 
+        if len(coordinates) == 0:
+            print("No click coordinates, delete CONFIG and recalibrate.")
+            sys.exit(1)
+
         start_paladins(steam_path)
-        execute_click_series(coordinates)
+        click_coordinates(coordinates)
+        close_paladins()
