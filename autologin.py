@@ -101,4 +101,5 @@ if __name__ == "__main__":
 
         start_paladins(steam_path)
         click_coordinates(coordinates)
+        time.sleep(10)
         close_paladins()
