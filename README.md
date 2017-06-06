@@ -6,7 +6,7 @@ This script is intended for use with Windows only and will very likely not funct
 
 # Setup
 
-## Pre-requisites:
+## Prerequisites:
 
 + Python 2.x / 3.x installation
 + Windows 7/8/10
