@@ -8,6 +8,9 @@ def start_paladins(steam_path):
     subprocess.call([steam_path, "-applaunch", "444090"])
     return
 
+def close_paladins():
+    return
+
 # vkcodes
 # https://gist.github.com/chriskiehl/2906125
 
@@ -25,6 +28,7 @@ def record_mouse_positions():
 
             if msg.message == win32con.WM_HOTKEY:
                 coordinate = pyautogui.position()
+                print("Recorded mouse coordinated: ", coordinate)
                 coordinates.append(coordinate)
                 count += 1
 
@@ -40,7 +44,7 @@ def record_mouse_positions():
     return coordinates
 
 
-def execute_click_series(coordinate_list):
+def execute_click_series(coordinates):
     return
 
 if __name__ == "__main__":
@@ -54,7 +58,7 @@ if __name__ == "__main__":
                 os.remove(config_file)
                 sys.exit(0)
 
-            start_paladins(steam_path)    
+            start_paladins(steam_path)
 
             coordinates = record_mouse_positions()
 
@@ -69,3 +73,7 @@ if __name__ == "__main__":
     with open(config_file) as json_config:
         py_dict = json.load(json_config)
         path = py_dict['path']
+        coordinates = py_dict['coordinates']
+
+        start_paladins(steam_path)
+        execute_click_series(coordinates)
