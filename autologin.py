@@ -8,10 +8,12 @@ def load_config_file():
     with open(config_file) as json_config:
         try:
             py_dict = json.load(json_config)
+            json_config.close()
             return py_dict
 
         except:
             print("Error loading config file, verify CONFIG is properly formatted JSON.")
+            json_config.close()
             sys.exit(1)
 
 
