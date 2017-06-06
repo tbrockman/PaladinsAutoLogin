@@ -1,5 +1,6 @@
 import subprocess, pyautogui, os, sys, json, msvcrt, time
 import win32con, ctypes, ctypes.wintypes
+import tkinter, win32api, pywintypes
 from tkinter.filedialog import askopenfilename
 
 config_file = "CONFIG"
@@ -26,6 +27,30 @@ def close_paladins():
 # vkcodes
 # https://gist.github.com/chriskiehl/2906125
 
+def click_coordinates(coordinates):
+    for i in range(len(coordinates)):
+        time.sleep(60)
+        pyautogui.click(coordinates[i])
+
+    return
+
+def create_label(text):
+    label = tkinter.Label(text=text, font=('Arial','80'), fg='white', bg='black', justify="center", wraplength=1500)
+    label.master.overrideredirect(True)
+    label.master.lift()
+    label.master.wm_attributes("-topmost", True)
+    label.master.wm_attributes("-disabled", True)
+
+    hWindow = pywintypes.HANDLE(int(label.master.frame(), 16))
+    # http://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx
+    # The WS_EX_TRANSPARENT flag makes events (like mouse clicks) fall through the window.
+    exStyle = win32con.WS_EX_COMPOSITED | win32con.WS_EX_LAYERED | win32con.WS_EX_NOACTIVATE | win32con.WS_EX_TOPMOST | win32con.WS_EX_TRANSPARENT
+    win32api.SetWindowLong(hWindow, win32con.GWL_EXSTYLE, exStyle)
+
+    label.pack()
+    label.update_idletasks()
+    label.update()
+
 def record_mouse_positions():
     # https://stackoverflow.com/questions/15777719/how-to-detect-key-press-when-the-console-window-has-lost-focus
     # Author: Jammerx2
@@ -36,6 +61,8 @@ def record_mouse_positions():
 
     try:
         msg = ctypes.wintypes.MSG()
+        create_label('Move your mouse over the play button and then press "a" on your keyboard.')
+
         while ctypes.windll.user32.GetMessageA(ctypes.byref(msg), None, 0, 0) != 0:
 
             if msg.message == win32con.WM_HOTKEY:
@@ -55,14 +82,9 @@ def record_mouse_positions():
 
     return coordinates
 
-def click_coordinates(coordinates):
-    for i in range(len(coordinates)):
-        time.sleep(60)
-        pyautogui.click(coordinates[i])
-
-    return
-
 if __name__ == "__main__":
+
+    config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_file)
 
     if not os.path.isfile(config_file):
         with open(config_file, "w+") as json_config:
