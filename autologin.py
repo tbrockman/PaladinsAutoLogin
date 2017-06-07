@@ -35,6 +35,9 @@ def click_coordinates(coordinates):
     return
 
 def create_label(text):
+    # https://stackoverflow.com/questions/21840133/how-to-display-text-on-the-screen-without-a-window-using-python
+    # Author: dln385
+
     label = tkinter.Label(text=text, font=('Arial','80'), fg='white', bg='black', justify="center", wraplength=1500)
     label.master.overrideredirect(True)
     label.master.lift()
@@ -50,6 +53,7 @@ def create_label(text):
     label.pack()
     label.update_idletasks()
     label.update()
+    return label
 
 def record_mouse_positions():
     # https://stackoverflow.com/questions/15777719/how-to-detect-key-press-when-the-console-window-has-lost-focus
@@ -61,18 +65,26 @@ def record_mouse_positions():
 
     try:
         msg = ctypes.wintypes.MSG()
-        create_label('Move your mouse over the play button and then press "a" on your keyboard.')
+        last_label = create_label('Move your mouse over to the "Play" button, pressing "a" on your keyboard when your cursor is hovering above it.')
 
         while ctypes.windll.user32.GetMessageA(ctypes.byref(msg), None, 0, 0) != 0:
 
             if msg.message == win32con.WM_HOTKEY:
+
+                if (count == 0):
+                    last_label.pack_forget()
+                    last_label = create_label('Now move your mouse over to the "Claim" button, again pressing "a" while hovering over the button.')
+
                 coordinate = pyautogui.position()
                 print("Recorded mouse coordinated: ", coordinate)
                 coordinates.append(coordinate)
+
                 count += 1
 
                 if (count == 2):
                     break
+
+
 
             ctypes.windll.user32.TranslateMessage(ctypes.byref(msg))
             ctypes.windll.user32.DispatchMessageA(ctypes.byref(msg))
